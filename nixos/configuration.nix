@@ -1,6 +1,6 @@
 { inputs, outputs, lib, config, pkgs, ... }: {
   imports = [
-    ./hardware-configuration.nix
+    ./hardware.nix
   ];
 
   nixpkgs = {
@@ -36,16 +36,17 @@
   };
 
   fonts = {
-    enableDefaultFonts = true;
-    fonts = with pkgs; [
+    packages = with pkgs; [
       (nerdfonts.override { fonts = [ "NerdFontsSymbolsOnly" ]; })
       cascadia-code
       jetbrains-mono
       recursive
       mononoki
       fantasque-sans-mono
+      sarasa-gothic
     ];
-    # fontconfig.defaultFonts.monospace = [ "mononoki" ];
+    fontconfig.defaultFonts.sansSerif = [ "Sarasa Gothic SC" ];
+    fontconfig.defaultFonts.serif = [ "Sarasa Gothic SC" ];
   };
 
   sound = {
@@ -117,10 +118,17 @@
   services = {
     xserver = {
       enable = true;
-      displayManager.lightdm.enable = true;
+      displayManager.lightdm = {
+        enable = true;
+        greeters.gtk.cursorTheme = {
+          package = pkgs.capitaine-cursors;
+          name = "capitaine-cursors";
+          size = 24;
+        };
+      };
       displayManager.sessionCommands = ''
         xset r rate 200 35
-        '';
+      '';
       windowManager.bspwm.enable = true;
       libinput = {
         touchpad.naturalScrolling = true;

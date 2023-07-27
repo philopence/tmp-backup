@@ -1,7 +1,7 @@
 { inputs, lib, config, pkgs, ... }:
 
 let
-  palette = (import ./palettes.nix)."gruvbox";
+  palette = (import ./palettes.nix)."monokai";
 in
 
 {
@@ -212,7 +212,8 @@ in
       "PALETTE" = palette."name";
     };
     font = {
-      name = "mononoki";
+      name = "Fantasque Sans Mono";
+      # name = "mononoki";
       size = 10;
     };
     settings = {
@@ -221,7 +222,7 @@ in
       # italic_font = "mononoki Italic";
       # bold_italic_font = "mononoki BoldItalic";
       # font_size = "10";
-      background_opacity = "0.8";
+      background_opacity = "1";
       cursor_shape = "beam";
       #
       foreground = palette."7";
@@ -266,7 +267,7 @@ in
       color16 = palette."F";
       color17 = palette."F";
       # "modify_font baseline" = 0;
-      # "modify_font cell_height" = 1;
+      "modify_font cell_height" = 1;
       "font_features CascadiaCode-Regular" = "+zero";
       "font_features CascadiaCode-Bold" = "+zero";
       "font_features CascadiaCode-Italic" = "+zero";
