@@ -1,4 +1,19 @@
-{ inputs, outputs, lib, config, pkgs, ... }: {
+{ inputs, outputs, lib, config, pkgs, ... }:
+let
+  wallpaper = builtins.fetchurl {
+    url = "https://w.wallhaven.cc/full/8o/wallhaven-8oky1j.jpg";
+    sha256 = "07m8gm75ihaxqdwsg43rg5wjx3silqa22zl15lylzqpj35150d72";
+  };
+  rimeZhwiki = builtins.fetchurl {
+    url = "https://github.com/felixonmars/fcitx5-pinyin-zhwiki/releases/download/0.2.4/zhwiki-20230728.dict.yaml";
+    sha256 = "083n6k9lc5d5f01n3nqnmsshmlzbb1ar3v40n393adiqxl5nrj98";
+  };
+  rimeMoegirl = builtins.fetchurl {
+    url = "https://github.com/outloudvi/mw2fcitx/releases/download/20230714/moegirl.dict.yaml";
+    sha256 = "1rfw94yxxgsp0hpfvj84745i7ag7l75wv74hv1id02pi9z4478ab";
+  };
+in
+{
   imports = [
     ./hardware.nix
   ];
@@ -41,12 +56,14 @@
       cascadia-code
       jetbrains-mono
       recursive
+      comic-mono
       mononoki
       fantasque-sans-mono
       sarasa-gothic
     ];
-    fontconfig.defaultFonts.sansSerif = [ "Sarasa Gothic SC" ];
-    fontconfig.defaultFonts.serif = [ "Sarasa Gothic SC" ];
+    fontconfig.defaultFonts.sansSerif = [ "Sarasa Mono SC" ];
+    fontconfig.defaultFonts.serif = [ "Sarasa Mono SC" ];
+    fontconfig.defaultFonts.monospace = [ "Sarasa Mono SC" ];
   };
 
   sound = {
@@ -76,7 +93,7 @@
       };
     };
     # networkmanager.enable = true;
-    firewall.enable = false;
+    firewall.enable = true;
   };
   services.v2raya.enable = true;
 
@@ -90,6 +107,7 @@
       XDG_STATE_HOME = "$HOME/.local/state";
       NIX_CONFIGURATION = "$HOME/.local/share/nix-configuration";
       GLFW_IM_MODULE = "ibus";
+      QT_QPA_PLATFORMTHEME = "qt5ct";
     };
   };
 
@@ -128,6 +146,15 @@
       };
       displayManager.sessionCommands = ''
         xset r rate 200 35
+        FILES=("$HOME/.background-image" "$XDG_DATA_HOME/fcitx5/rime/zhwiki.dict.yaml" "$XDG_DATA_HOME/fcitx5/rime/moegirl.dict.yaml")
+
+        for FILE in "''${FILES[@]}"; do
+          if [ ! -f $FILE ]; then
+            install -Dm644 ${wallpaper}
+            install -Dm644 ${rimeZhwiki} $XDG_DATA_HOME/fcitx5/rime/zhwiki.dict.yaml
+            install -Dm644 ${rimeMoegirl} $XDG_DATA_HOME/fcitx5/rime/moegirl.dict.yaml
+          fi
+        done
       '';
       windowManager.bspwm.enable = true;
       libinput = {
@@ -138,7 +165,7 @@
 
   services.udisks2.enable = true;
 
-  environment.systemPackages = with pkgs; [];
+  environment.systemPackages = with pkgs; [ ];
 
   # https://nixos.wiki/wiki/FAQ/When_do_I_update_stateVersion
   system.stateVersion = "23.05";

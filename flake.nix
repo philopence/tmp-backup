@@ -11,6 +11,7 @@
   };
 
   outputs = { nixpkgs, home-manager, ... }@inputs: {
+    formatter.x86_64-linux = nixpkgs.legacyPackages.x86_64-linux.nixpkgs-fmt;
     # nixos-rebuild switch --flake <flake-uri>#hostname
     nixosConfigurations = {
       nixos = nixpkgs.lib.nixosSystem {

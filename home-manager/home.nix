@@ -1,7 +1,7 @@
 { inputs, lib, config, pkgs, ... }:
 
 let
-  palette = (import ./palettes.nix)."monokai";
+  palette = (import ./palettes.nix)."gruvbox";
 in
 
 {
@@ -33,8 +33,11 @@ in
       gnumake
       gcc
       unzip
+      zip
       xclip
       brightnessctl
+      trashy
+      chafa
       fishPlugins.z
       fishPlugins.done
       nodejs
@@ -44,14 +47,45 @@ in
       nodePackages.vscode-langservers-extracted
       nodePackages.typescript-language-server
       lua-language-server
-      ripgrep fd bat fzf
-      jq html-tidy stylua
+      ripgrep
+      fd
+      bat
+      fzf
+      jq
+      html-tidy
+      stylua
       httpie
       ranger
       btop
       lazygit
       scrot
       keepassxc
+      pcmanfm
+      papirus-icon-theme
+    ];
+  };
+
+  gtk = {
+    enable = true;
+    font.name = "monospace";
+    iconTheme = {
+      name = "Papirus-Dark";
+    };
+    theme = {
+      package = pkgs.materia-theme;
+      name = "Materia-dark";
+    };
+  };
+
+  qt = {
+    enable = true;
+    platformTheme = "qtct";
+    style.name = "kvantum";
+    style.package = with pkgs; [
+      materia-kde-theme
+      qtstyleplugin-kvantum-qt4
+      libsForQt5.qtstyleplugin-kvantum
+      qt6Packages.qtstyleplugin-kvantum
     ];
   };
 
@@ -63,43 +97,43 @@ in
       createDirectories = true;
     };
 
-  dataFile = {
-    "fcitx5/rime/default.custom.yaml".text = ''
-      patch:
-        ascii_composer:
-          switch_key:
-            Shift_L: noop
-            Shift_R: noop
-            # Shift_L: commit_code
-            # Shift_R: commit_text
-        key_binder:
-          bindings:
-            - {accept: Left, send: Page_Up, when: has_menu}
-            - {accept: Right, send: Page_Down, when: has_menu}
-            # - {accept: "Release+Escape", toggle: ascii_mode, when: always}
-    '';
-    "fcitx5/rime/luna_pinyin.custom.yaml".text = ''
-      patch:
-        "switches/@0/reset": 0
-        "recognizer/patterns/reverse_lookup":
-        "translator/dictionary": extended
-        "punctuator/half_shape/=":
-          "'": {pair: ["「", "」"]}
-          '"': {pair: ["『", "』"]}
-    '';
-    "fcitx5/rime/extended.dict.yaml".text = ''
-      ---
-      name: extended
-      version: "0.0.1"
-      sort: by_weight
-      use_preset_vocabulary: true
-      import_tables:
-        - luna_pinyin
-        - zhwiki
-        - moegirl
-      ...
-    '';
-  };
+    dataFile = {
+      "fcitx5/rime/default.custom.yaml".text = ''
+        patch:
+          ascii_composer:
+            switch_key:
+              Shift_L: noop
+              Shift_R: noop
+              # Shift_L: commit_code
+              # Shift_R: commit_text
+          key_binder:
+            bindings:
+              - {accept: Left, send: Page_Up, when: has_menu}
+              - {accept: Right, send: Page_Down, when: has_menu}
+              # - {accept: "Release+Escape", toggle: ascii_mode, when: always}
+      '';
+      "fcitx5/rime/luna_pinyin.custom.yaml".text = ''
+        patch:
+          "switches/@0/reset": 0
+          "recognizer/patterns/reverse_lookup":
+          "translator/dictionary": extended
+          "punctuator/half_shape/=":
+            "'": {pair: ["「", "」"]}
+            '"': {pair: ["『", "』"]}
+      '';
+      "fcitx5/rime/extended.dict.yaml".text = ''
+        ---
+        name: extended
+        version: "0.0.1"
+        sort: by_weight
+        use_preset_vocabulary: true
+        import_tables:
+          - luna_pinyin
+          - zhwiki
+          - moegirl
+        ...
+      '';
+    };
 
   };
 
@@ -113,16 +147,19 @@ in
       bspc config bottom_padding       0
       bspc config left_padding         0
       bspc config right_padding        0
-      bspc config normal_border_color  "${palette."7"}"
+      bspc config normal_border_color  "${palette."5"}"
       bspc config focused_border_color "${palette."B"}"
       bspc config split_ratio          0.50
       bspc config borderless_monocle   true
       bspc config gapless_monocle      true
       bspc rule -a kitty desktop='^1'
       bspc rule -a Chromium-browser desktop='^2'
+      bspc rule -a SystemInfo state=floating center=on
       bspc desktop "^2" --layout monocle
     '';
     "sxhkd/sxhkdrc".text = ''
+      super + p
+        kitty --class "SystemInfo" btop
       super + Escape
         pkill -USR1 -x sxhkd
       super + {_,shift + }Return
@@ -209,20 +246,24 @@ in
   programs.kitty = {
     enable = true;
     environment = {
-      "PALETTE" = palette."name";
+      "THEME" = palette."name";
     };
-    font = {
-      name = "Fantasque Sans Mono";
-      # name = "mononoki";
-      size = 10;
-    };
+    # font = {
+    #   name = "Rec Mono Linear";
+    #   # name = "mononoki";
+    #   size = 11;
+    # };
     settings = {
-      # font_family = "mononoki Regular";
-      # bold_font = "mononoki Bold";
-      # italic_font = "mononoki Italic";
-      # bold_italic_font = "mononoki BoldItalic";
-      # font_size = "10";
-      background_opacity = "1";
+      # font_family = "Rec Mono Casual";
+      # bold_font = "Rec Mono Casual Bold";
+      # italic_font = "Rec Mono Casual Italic";
+      # bold_italic_font = "Rec Mono Casual Bold Italic";
+      font_family = "Cascadia Code Regular";
+      bold_font = "Cascadia Code Bold";
+      italic_font = "Cascadia Code Italic";
+      bold_italic_font = "Cascadia Code Bold Italic";
+      font_size = "10";
+      background_opacity = "0.9";
       cursor_shape = "beam";
       #
       foreground = palette."7";
@@ -248,25 +289,25 @@ in
       mark2_background = palette."E";
       mark3_foreground = palette."1";
       mark3_background = palette."F";
-      color0  = palette."0";
-      color8  = palette."2";
-      color1  = palette."8";
-      color9  = palette."8";
-      color2  = palette."9";
+      color0 = palette."0";
+      color8 = palette."2";
+      color1 = palette."8";
+      color9 = palette."8";
+      color2 = palette."9";
       color10 = palette."9";
-      color3  = palette."A";
+      color3 = palette."A";
       color11 = palette."A";
-      color4  = palette."B";
+      color4 = palette."B";
       color12 = palette."B";
-      color5  = palette."C";
+      color5 = palette."C";
       color13 = palette."C";
-      color6  = palette."D";
+      color6 = palette."D";
       color14 = palette."D";
-      color7  = palette."E";
+      color7 = palette."E";
       color15 = palette."E";
       color16 = palette."F";
       color17 = palette."F";
-      # "modify_font baseline" = 0;
+      # "modify_font baseline" = -1;
       "modify_font cell_height" = 1;
       "font_features CascadiaCode-Regular" = "+zero";
       "font_features CascadiaCode-Bold" = "+zero";
@@ -308,7 +349,66 @@ in
 
   programs.rofi = {
     enable = true;
-    font = "mono 10";
+    # font = "Rec Mono Casual 12";
+    extraConfig = {
+      show-icons = true;
+      icon-theme = "Papirus";
+      display-drun = "";
+      drun-display-format = "{name}";
+      drun-match-fields = "name";
+    };
+    theme =
+      let
+        inherit (config.lib.formats.rasi) mkLiteral;
+      in
+      {
+        "*" = {
+          text-color = mkLiteral palette."7";
+          background-color = mkLiteral palette."1";
+          border-color = mkLiteral palette."B";
+        };
+        "window" = {
+          font = "mono 12";
+          # width = 512;
+        };
+        "#inputbar" = {
+          children = map mkLiteral [ "prompt" "entry" ];
+        };
+        "#prompt" = {
+          font = "mono 24";
+          padding = mkLiteral "0.5em 2em";
+          text-color = mkLiteral palette."1";
+          background-color = mkLiteral palette."B";
+          vertical-align = mkLiteral "0.5";
+        };
+        "#entry" = {
+          padding = mkLiteral "0 1em";
+          vertical-align = mkLiteral "0.5";
+        };
+        "#listview" = {
+          lines = mkLiteral "7";
+          columns = mkLiteral "2";
+          padding = mkLiteral "1em 0";
+        };
+        "#element" = {
+          padding = mkLiteral "0.2em 1em";
+          spacing = mkLiteral "0.5em";
+        };
+        "#element selected" = {
+          text-color = mkLiteral palette."B";
+          text-transform = mkLiteral "bold";
+        };
+        "#element-icon" = {
+          size = mkLiteral "32";
+          vertical-align = mkLiteral "0.5";
+        };
+        "#element-text" = {
+          text-color = mkLiteral "inherit";
+          # background-color = mkLiteral "inherit";
+          text-transform = mkLiteral "inherit";
+          vertical-align = mkLiteral "0.5";
+        };
+      };
   };
 
   programs.chromium = {
@@ -334,9 +434,9 @@ in
         set_color normal
         echo -n (set_color red)"]"
         if fish_is_root_user
-          echo -n (set_color normal)"#"" "
+          echo -n (set_color cyan)"#"" "
         else
-          echo -n (set_color normal)"\$"" "
+          echo -n (set_color cyan)"\$"" "
         end
         set_color normal
       '';
