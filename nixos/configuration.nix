@@ -96,6 +96,11 @@ in
     firewall.enable = true;
   };
   services.v2raya.enable = true;
+  services.udev.packages = with pkgs; [via vial];
+  hardware.keyboard.qmk.enable = true;
+  services.udev.extraRules = ''
+    KERNEL=="hidraw*", SUBSYSTEM=="hidraw", ATTRS{serial}=="*vial:f64c2b3c*", MODE="0660", GROUP="users", TAG+="uaccess", TAG+="udev-acl"
+  '';
 
   environment = {
     localBinInPath = true;
@@ -146,8 +151,8 @@ in
       };
       displayManager.sessionCommands = ''
         xset r rate 200 35
+        fcitx5 &
         FILES=("$HOME/.background-image" "$XDG_DATA_HOME/fcitx5/rime/zhwiki.dict.yaml" "$XDG_DATA_HOME/fcitx5/rime/moegirl.dict.yaml")
-
         for FILE in "''${FILES[@]}"; do
           if [ ! -f $FILE ]; then
             install -Dm644 ${wallpaper}
@@ -164,6 +169,8 @@ in
   };
 
   services.udisks2.enable = true;
+
+  virtualisation.docker.enable = true;
 
   environment.systemPackages = with pkgs; [ ];
 

@@ -62,6 +62,17 @@ in
       keepassxc
       pcmanfm
       papirus-icon-theme
+      # keyboard
+      kicad
+      qmk
+      unar
+      appimage-run
+      inkscape
+      wget
+      autoconf
+      automake
+      conda
+      docker
     ];
   };
 
@@ -158,6 +169,10 @@ in
       bspc desktop "^2" --layout monocle
     '';
     "sxhkd/sxhkdrc".text = ''
+      super + shift + s
+        scrot 'desktop.png'
+      super + s
+        scrot -s '%Y-%m-%d_$wx$h.png'
       super + p
         kitty --class "SystemInfo" btop
       super + Escape
@@ -370,6 +385,9 @@ in
         "window" = {
           font = "mono 12";
           # width = 512;
+        };
+        "#mainbox" = {
+          padding = mkLiteral "0.5em";
         };
         "#inputbar" = {
           children = map mkLiteral [ "prompt" "entry" ];
